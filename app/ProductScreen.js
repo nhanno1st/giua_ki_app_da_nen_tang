@@ -1,9 +1,12 @@
 // ProductScreen.js
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, FlatList, Image, StyleSheet } from 'react-native';
-import { db } from '../constants/firebaseConfig';
+import { db, auth } from '../constants/firebaseConfig';
 import { collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 import * as ImagePicker from 'expo-image-picker';
+import { TouchableOpacity } from 'react-native';
+import { signOut } from 'firebase/auth';
+import { useRouter } from 'expo-router';
 
 const ProductScreen = () => {
   const [products, setProducts] = useState([]);
@@ -12,7 +15,7 @@ const ProductScreen = () => {
   const [price, setPrice] = useState('');
   const [imageUri, setImageUri] = useState(null);
   const [editingProductId, setEditingProductId] = useState(null); // Trạng thái để biết sản phẩm nào đang được sửa
-
+  const router = useRouter();
   // Lấy danh sách sản phẩm từ Firestore
   const fetchProducts = async () => {
     const querySnapshot = await getDocs(collection(db, 'products'));
@@ -94,11 +97,24 @@ const ProductScreen = () => {
   useEffect(() => {
     fetchProducts();
   }, []);
-
+  const handleLogout = () => {
+    signOut(auth)
+      .then(() => {
+        alert('Đăng xuất thành công!');
+        router.push('/LoginScreen');
+      })
+      .catch((error) => {
+        alert('Lỗi khi đăng xuất: ' + error.message);
+      });
+  };
   return (
     <View style={styles.container}>
-      <Text style={styles.headerText}>Quản lý sản phẩm</Text>
-
+      <View style={styles.headerContainer}>
+  <Text style={styles.headerText}>Quản lý sản phẩm</Text>
+  <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
+    <Text style={styles.logoutText}>Logout</Text>
+  </TouchableOpacity>
+</View>
       <TextInput
         style={styles.input}
         value={name}
@@ -165,12 +181,25 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f9fa',
     flex: 1,
   },
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
   headerText: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#333',
-    textAlign: 'center',
-    marginBottom: 20,
+  },
+  logoutButton: {
+    padding: 10,
+    backgroundColor: '#F44336',
+    borderRadius: 5,
+  },
+  logoutText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
   input: {
     borderWidth: 1,

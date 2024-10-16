@@ -1,6 +1,6 @@
 // LoginScreen.js
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Alert, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { auth } from '../constants/firebaseConfig';
 import { signOut } from 'firebase/auth';
 import { useRouter } from 'expo-router';
@@ -15,23 +15,23 @@ const LoginScreen = () => {
   const handleLogin = () => {
     signInWithEmailAndPassword(auth, email, password)
       .then(() => {
-        Alert.alert('Login successfully');
+        alert('Login successfully');
         router.push('/ProductScreen');
       })
       .catch((error) => {
         console.error('Login failed', error);
-        Alert.alert('Login failed', error.message);
+        alert('Login failed', error.message);
       });
   };
 
   const handleAddAccount = () => {
     createUserWithEmailAndPassword(auth, email, password)
       .then(() => {
-        Alert.alert('Account created successfully');
+        alert('Account created successfully');
         return signOut(auth);
       })
       .catch((error) => {
-        Alert.alert('Error creating account', error.message);
+        alert('Error creating account', error.message);
       });
   };
 
